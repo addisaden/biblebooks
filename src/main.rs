@@ -1,6 +1,13 @@
 extern crate colored;
 
 use colored::*;
+use std::env;
+
+struct BookCollection {
+    title: &'static str,
+    books: &'static[&'static str],
+    color: &'static str,
+}
 
 fn ot_books() -> &'static[&'static str] {
     &[
@@ -79,16 +86,36 @@ fn nt_books() -> &'static[&'static str] {
 }
 
 fn main() {
-    let title = "Biblebooks".bold();
-    let subtitle = "Find books in the bible".green();
+    let arguments: Vec<String> = env::args().collect();
 
-    println!("{}\n{}\n", title, subtitle);
-
-    for book in ot_books() {
-        println!("{}", book.blue().italic())
+    let has_search = arguments.len() >= 2;
+    let mut search = "";
+    if has_search {
+        search = arguments[1].as_str();
     }
 
-    for book in nt_books() {
-        println!("{}", book.yellow().italic())
+    let title = "Biblebooks".bold();
+    let subtitle = "Finde Bücher in der Bibel".green();
+
+    println!("{}\n{}", title, subtitle);
+
+    let books = [
+        BookCollection{title: "Altes Testament", books: ot_books(), color: "blue"},
+        BookCollection{title: "Neues Testament", books: nt_books(), color: "yellow"}
+        ];
+
+    for book_collection in books.iter() {
+        println!("\n{}", book_collection.title.italic());
+        for (book_index, book) in book_collection.books.iter().enumerate() {
+            let mut show = true;
+            if has_search {
+                if book.to_lowercase().find(&search.to_lowercase()) == None {
+                    show = false;
+                }
+            }
+            if show {
+                println!("{} {}", book_index + 1, book.color(book_collection.color).italic().bold());
+            }
+        }
     }
 }
