@@ -94,6 +94,8 @@ fn main() {
         search = arguments[1].as_str();
     }
 
+    let surround = 2;
+
     let title = "Biblebooks".bold();
     let subtitle = "Finde Bücher in der Bibel".green();
 
@@ -105,6 +107,9 @@ fn main() {
         ];
 
     for book_collection in books.iter() {
+        let mut last_five : Vec<usize> = vec![];
+        let mut counter = 0;
+
         println!("\n{}", book_collection.title.italic());
         for (book_index, book) in book_collection.books.iter().enumerate() {
             let mut show = true;
@@ -114,7 +119,22 @@ fn main() {
                 }
             }
             if show {
+                for last_one in last_five {
+                    println!("{} {}", last_one + 1, book_collection.books[last_one]);
+                }
                 println!("{} {}", book_index + 1, book.color(book_collection.color).italic().bold());
+                last_five = vec![];
+                counter = surround;
+            } else {
+                if counter > 0 {
+                    println!("{} {}", book_index + 1, book);
+                    counter -= 1;
+                } else {
+                    last_five.push(book_index);
+                    while last_five.len() > surround {
+                        last_five.remove(0);
+                    }
+                }
             }
         }
     }
