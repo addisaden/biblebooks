@@ -9,6 +9,9 @@ struct BookCollection {
     color: &'static str,
 }
 
+/// Returns a list of all books from
+/// the old testament of the bible
+/// in german
 fn ot_books() -> &'static[&'static str] {
     &[
         "1 Mose",
@@ -53,6 +56,9 @@ fn ot_books() -> &'static[&'static str] {
     ]
 }
 
+/// Returns a list of all books from
+/// the new testament of the bible
+/// in german
 fn nt_books() -> &'static[&'static str] {
     &[
        "Matthäus",
@@ -86,6 +92,7 @@ fn nt_books() -> &'static[&'static str] {
 }
 
 fn main() {
+    // get search string
     let arguments: Vec<String> = env::args().collect();
 
     let has_search = arguments.len() >= 2;
@@ -94,13 +101,16 @@ fn main() {
         search = arguments[1].as_str();
     }
 
+    // surrounding books on match
     let surround = 2;
 
+    // teaser of program
     let title = "Biblebooks".bold();
     let subtitle = "Finde Bücher in der Bibel".green();
 
     println!("{}\n{}", title, subtitle);
 
+    // collect books
     let books = [
         BookCollection{title: "Altes Testament", books: ot_books(), color: "blue"},
         BookCollection{title: "Neues Testament", books: nt_books(), color: "yellow"}
@@ -113,23 +123,33 @@ fn main() {
         println!("\n{}", book_collection.title.italic());
         for (book_index, book) in book_collection.books.iter().enumerate() {
             let mut show = true;
+
+            // filter only the matches
             if has_search {
                 if book.to_lowercase().find(&search.to_lowercase()) == None {
                     show = false;
                 }
             }
+
             if show {
+                // print books before the match
                 for last_one in last_five {
                     println!("{} {}", last_one + 1, book_collection.books[last_one]);
                 }
+
+                // print match
                 println!("{} {}", book_index + 1, book.color(book_collection.color).italic().bold());
+
+                // clear surrounding books state
                 last_five = vec![];
                 counter = surround;
             } else {
                 if counter > 0 {
+                    // print surrounding books after match
                     println!("{} {}", book_index + 1, book);
                     counter -= 1;
                 } else {
+                    // add book to before match vector
                     last_five.push(book_index);
                     while last_five.len() > surround {
                         last_five.remove(0);
